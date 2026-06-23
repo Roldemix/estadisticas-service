@@ -43,13 +43,11 @@ app.add_middleware(
 
 @app.get("/health/live")
 def liveness():
-    """Liveness probe: indica que el proceso está vivo."""
     return {"status": "ok"}
 
 
 @app.get("/health/ready")
 def readiness():
-    """Readiness probe: comprueba la conexión a la base de datos."""
     try:
         with conexion() as conn:
             with dict_cursor(conn) as cur:
