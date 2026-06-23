@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: estadisticas
+  namespace: casino
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: estadisticas
+  template:
+    metadata:
+      labels:
+        app: estadisticas
+    spec:
+      containers:
+        - name: estadisticas
+          image: casino/estadisticas-service:latest
+          ports:
+            - containerPort: 8000
