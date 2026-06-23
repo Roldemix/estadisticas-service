@@ -11,7 +11,7 @@ Prefijo de rutas: /api/estadisticas
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from .auth import usuario_actual
@@ -41,10 +41,25 @@ app.add_middleware(
 )
 
 
-# TODO (alumno): implementar las rutas de salud que usará Kubernetes:
-#   - liveness: ¿el proceso está vivo? (respuesta simple).
-#   - readiness: ¿está listo para recibir tráfico? Debe verificar la BD.
-# Luego configurar livenessProbe/readinessProbe en el Deployment de EKS.
+@app.get("/health/live")
+def liveness():
+    """Liveness probe: indica que el proceso está vivo."""
+    return {"status": "ok"}
+
+
+@app.get("/health/ready")
+def readiness():
+    """Readiness probe: comprueba la conexión a la base de datos."""
+    try:
+        with conexion() as conn:
+            with dict_cursor(conn) as cur:
+                cur.execute("SELECT 1")
+                if cur.fetchone():
+                    return {"status": "ready"}
+    except Exception:
+        raise HTTPException(status_code=503, detail="database unavailable")
+
+    raise HTTPException(status_code=503, detail="not ready")
 
 
 @app.get("/api/estadisticas/mias")
