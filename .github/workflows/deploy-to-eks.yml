@@ -43,6 +43,11 @@ jobs:
         run: |
           aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
+      - name: Apply kubernetes manifests
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl -n casino apply -f k8s/
+
       - name: Update deployment image
         env:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -52,4 +57,5 @@ jobs:
         run: |
           set -euo pipefail
           image="${ECR_REGISTRY}/${ECR_NAMESPACE}/${IMAGE_NAME}:${IMAGE_TAG}"
-          kubectl -n casino set image deployment/estadisticas estadisticas=${image} || echo "set image failed"
+          kubectl -n casino set image deployment/estadisticas estadisticas=${image}
+          kubectl -n casino rollout status deployment/estadisticas --timeout=180s
