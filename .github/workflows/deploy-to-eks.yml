@@ -45,7 +45,7 @@ jobs:
 
       - name: Apply kubernetes manifests
         run: |
-          kubectl apply -f k8s/namespace.yaml
+          set -euo pipefail
           kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
 
