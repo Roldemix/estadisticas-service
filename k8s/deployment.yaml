@@ -5,6 +5,8 @@ metadata:
   namespace: casino
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: estadisticas
@@ -17,7 +19,7 @@ spec:
         - name: estadisticas
           image: 851725353324.dkr.ecr.us-east-1.amazonaws.com/casino/estadisticas-service:latest
           ports:
-            - containerPort: 8000
+            - containerPort: 8006
           env:
             - name: DB_HOST
               value: "postgres.casino.svc.cluster.local"
@@ -38,11 +40,3 @@ spec:
                 secretKeyRef:
                   name: postgres-credentials
                   key: POSTGRES_DB
-          livenessProbe:
-            httpGet:
-              path: /health/live
-              port: 8000
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 3
-            failureThreshold: 3
