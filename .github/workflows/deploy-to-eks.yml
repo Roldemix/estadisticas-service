@@ -15,6 +15,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Run tests
+        if: hashFiles('tests/**/*.py') != ''
+        run: python3 tests/test_simulacion.py
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
